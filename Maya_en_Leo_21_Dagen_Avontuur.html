@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maya &amp; Leo · 21-Dagen Avontuur</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Patrick+Hand&family=Schoolbell&display=swap" rel="stylesheet">
+<style>
+  /* ============================================
+     MAYA & LEO · 21 DAY ADVENTURE
+     Children's habit tracker, ages 6
+     ============================================ */
+
+  /* -------- SHARED TOKENS -------- */
+  :root {
+    --ink: #2a2520;
+    --ink-soft: #4a423a;
+    --paper: #fff8ec;
+    --paper-light: #fffdf5;
+    --muted: #9e968a;
+
+    /* Leo — basketball orange + court wood + cat gray */
+    --leo-primary: #e8702a;        /* basketball orange */
+    --leo-primary-dark: #c04d10;
+    --leo-secondary: #6ba3c9;      /* jersey blue */
+    --leo-accent: #f5c96b;          /* warm gold */
+    --leo-court: #e8d9b8;            /* wood floor */
+    --leo-kitten: #7a6b5d;           /* tabby gray-brown */
+    --leo-bg: #fef3e7;
+
+    /* Maya — tennis green + sky + pink */
+    --maya-primary: #5ba36b;         /* tennis court green */
+    --maya-primary-dark: #3d7a4c;
+    --maya-secondary: #e8a5c4;       /* soft raspberry */
+    --maya-accent: #f4d94e;          /* tennis ball yellow */
+    --maya-court: #b8dcc4;            /* soft grass */
+    --maya-kitten: #b8826a;           /* ginger cat */
+    --maya-bg: #effaf1;
+
+    --font-display: 'Fredoka', 'Helvetica Rounded', 'Arial Rounded MT Bold', sans-serif;
+    --font-hand: 'Patrick Hand', 'Comic Sans MS', cursive;
+    --font-chalk: 'Schoolbell', cursive;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    font-family: var(--font-display);
+    color: var(--ink);
+    background: #f3ece0;
+    line-height: 1.4;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(circle at 15% 20%, rgba(232, 112, 42, 0.04), transparent 50%),
+      radial-gradient(circle at 85% 80%, rgba(91, 163, 107, 0.04), transparent 50%);
+  }
+
+  .app {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem 3rem;
+  }
+
+  /* -------- TOP HEADER -------- */
+  .header {
+    text-align: center;
+    padding: 0.5rem 0 1.5rem;
+    position: relative;
+  }
+  .header h1 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.8rem, 5vw, 2.8rem);
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .header h1 .amp {
+    color: var(--leo-primary);
+    font-weight: 400;
+    font-style: italic;
+    display: inline-block;
+    transform: rotate(-5deg);
+    margin: 0 0.1em;
+  }
+  .header h1 .maya-name { color: var(--maya-primary-dark); }
+  .header h1 .leo-name  { color: var(--leo-primary-dark); }
+  .header .sub {
+    font-family: var(--font-hand);
+    font-size: 1.15rem;
+    color: var(--ink-soft);
+    margin-top: 0.3rem;
+  }
+  .header .dates {
+    display: inline-block;
+    margin-top: 0.4rem;
+    padding: 0.3rem 1rem;
+    background: white;
+    border: 2px dashed var(--ink-soft);
+    border-radius: 30px;
+    font-family: var(--font-hand);
+    font-size: 1rem;
+    color: var(--ink);
+    transform: rotate(-0.5deg);
+  }
+
+  /* -------- PICKER (switch between Leo / Maya / Both) -------- */
+  .picker {
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem;
+    margin: 1rem 0 2rem;
+    flex-wrap: wrap;
+  }
+  .picker button {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 0.6rem 1.4rem;
+    border-radius: 30px;
+    border: 3px solid transparent;
+    background: white;
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  }
+  .picker button:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+  .picker button.active-leo  { background: var(--leo-primary);  color: white; border-color: var(--leo-primary-dark); }
+  .picker button.active-maya { background: var(--maya-primary); color: white; border-color: var(--maya-primary-dark); }
+  .picker button.active-both { background: var(--ink); color: white; border-color: var(--ink-soft); }
+
+  /* -------- CHART CONTAINER -------- */
+  .charts {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    align-items: start;
+  }
+  .charts.both { grid-template-columns: 1fr 1fr; }
+  @media (max-width: 900px) {
+    .charts.both { grid-template-columns: 1fr; }
+  }
+
+  .chart {
+    background: var(--paper);
+    border-radius: 24px;
+    padding: 1.5rem 1.25rem 2rem;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08), inset 0 0 0 4px white, inset 0 0 0 6px var(--paper);
+    position: relative;
+    overflow: hidden;
+  }
+  .chart.leo  { background: var(--leo-bg);  box-shadow: 0 8px 24px rgba(232, 112, 42, 0.15), inset 0 0 0 4px white, inset 0 0 0 6px var(--leo-accent); }
+  .chart.maya { background: var(--maya-bg); box-shadow: 0 8px 24px rgba(91, 163, 107, 0.15), inset 0 0 0 4px white, inset 0 0 0 6px var(--maya-accent); }
+
+  .chart.hidden { display: none; }
+
+  /* -------- CHART HEADER (the kid's name + mascot) -------- */
+  .chart-header {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1rem;
+    align-items: center;
+    padding-bottom: 1rem;
+    border-bottom: 3px dotted rgba(0,0,0,0.1);
+    margin-bottom: 1.25rem;
+  }
+  .mascot {
+    width: 120px;
+    height: 120px;
+    flex-shrink: 0;
+  }
+  .chart-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    line-height: 1;
+    margin-bottom: 0.15rem;
+  }
+  .leo .chart-title  { color: var(--leo-primary-dark); }
+  .maya .chart-title { color: var(--maya-primary-dark); }
+  .chart-motto {
+    font-family: var(--font-hand);
+    font-size: 1.1rem;
+    color: var(--ink-soft);
+    line-height: 1.3;
+  }
+  .leo .chart-motto em  { color: var(--leo-primary);  font-style: normal; font-weight: 600; }
+  .maya .chart-motto em { color: var(--maya-primary); font-style: normal; font-weight: 600; }
+
+  /* -------- 21 DAY PROGRESS DISPLAY (visible for kids) -------- */
+  .progress-row {
+    background: white;
+    border-radius: 16px;
+    padding: 1rem;
+    margin-bottom: 1.25rem;
+    text-align: center;
+  }
+  .progress-label {
+    font-family: var(--font-hand);
+    font-size: 1rem;
+    color: var(--ink-soft);
+    margin-bottom: 0.6rem;
+  }
+  .progress-label .big-num {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.8rem;
+    line-height: 1;
+    vertical-align: -4px;
+    margin: 0 0.15em;
+  }
+  .leo  .progress-label .big-num { color: var(--leo-primary-dark); }
+  .maya .progress-label .big-num { color: var(--maya-primary-dark); }
+
+  .stars-row {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.35rem;
+    max-width: 380px;
+    margin: 0 auto;
+  }
+  .star {
+    aspect-ratio: 1;
+    width: 100%;
+    max-width: 36px;
+    margin: 0 auto;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-family: var(--font-hand);
+    color: rgba(0,0,0,0.25);
+    transition: transform 0.3s ease, background 0.3s ease;
+    position: relative;
+  }
+  .star.complete {
+    background: var(--leo-accent);
+    color: var(--leo-primary-dark);
+    font-weight: 700;
+    transform: scale(1.08);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  }
+  .maya .star.complete {
+    background: var(--maya-accent);
+    color: var(--maya-primary-dark);
+  }
+  .star.partial {
+    background: rgba(0,0,0,0.15);
+    color: rgba(0,0,0,0.4);
+  }
+
+  /* -------- HABIT ROWS (per day) -------- */
+  .table-wrap {
+    background: white;
+    border-radius: 16px;
+    padding: 0.5rem;
+    overflow-x: auto;
+  }
+  table.days {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 420px;
+  }
+  table.days thead th {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.88rem;
+    text-align: center;
+    padding: 0.75rem 0.3rem;
+    color: var(--ink);
+    border-bottom: 2px solid rgba(0,0,0,0.08);
+    letter-spacing: 0.02em;
+  }
+  table.days thead th .ht-icon {
+    display: block;
+    font-size: 1.6rem;
+    margin-bottom: 0.15rem;
+    line-height: 1;
+  }
+  table.days thead th .ht-time {
+    display: block;
+    font-family: var(--font-hand);
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-weight: 400;
+    margin-top: 0.15rem;
+  }
+
+  /* Columns */
+  table.days col.c-day    { width: 22%; }
+  table.days col.c-habit  { width: 19.5%; }
+  table.days col.c-prize  { width: 19.5%; }
+
+  table.days tbody td {
+    padding: 0.35rem 0.2rem;
+    text-align: center;
+    vertical-align: middle;
+    height: 52px;
+    border-bottom: 1px dashed rgba(0,0,0,0.06);
+  }
+  table.days tbody tr:last-child td { border-bottom: none; }
+  table.days tbody tr.today td { background: rgba(245, 201, 107, 0.15); }
+  .maya table.days tbody tr.today td { background: rgba(244, 217, 78, 0.18); }
+
+  td.day-label {
+    text-align: left;
+    padding-left: 0.75rem;
+    font-family: var(--font-hand);
+    font-size: 1rem;
+    color: var(--ink);
+    line-height: 1.1;
+  }
+  td.day-label .d-num {
+    display: block;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .leo td.day-label .d-num  { color: var(--leo-primary-dark); }
+  .maya td.day-label .d-num { color: var(--maya-primary-dark); }
+  td.day-label .d-date {
+    display: block;
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-top: 0.15rem;
+  }
+
+  /* -------- ENCOURAGEMENT POP -------- */
+  .encourage {
+    margin-top: 0.75rem;
+    text-align: center;
+    font-family: var(--font-hand);
+    font-size: 1.05rem;
+    padding: 0.6rem 1rem;
+    border-radius: 12px;
+    background: white;
+    border: 2px dashed var(--leo-primary);
+    color: var(--leo-primary-dark);
+    min-height: 2.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s ease, transform 0.3s ease;
+  }
+  .maya .encourage {
+    border-color: var(--maya-primary);
+    color: var(--maya-primary-dark);
+  }
+  .encourage.empty {
+    border-style: dotted;
+    color: var(--muted);
+    font-style: italic;
+    background: rgba(255,255,255,0.5);
+  }
+  .encourage.celebrate {
+    animation: wiggle 0.6s ease;
+    background: #fff9e8;
+  }
+  @keyframes wiggle {
+    0%, 100% { transform: rotate(0); }
+    25% { transform: rotate(-2deg) scale(1.03); }
+    75% { transform: rotate(2deg) scale(1.03); }
+  }
+
+  /* -------- CHECK BUTTONS -------- */
+  .check-box {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    border: 3px solid;
+    border-radius: 12px;
+    background: white;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.2s ease;
+    position: relative;
+    vertical-align: middle;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .check-box:hover { transform: scale(1.1) rotate(-3deg); }
+  .check-box:active { transform: scale(0.95); }
+
+  .leo .check-box  { border-color: var(--leo-primary-dark); }
+  .maya .check-box { border-color: var(--maya-primary-dark); }
+
+  .check-box.checked { background: var(--leo-primary); border-color: var(--leo-primary-dark); }
+  .maya .check-box.checked { background: var(--maya-primary); border-color: var(--maya-primary-dark); }
+
+  .check-box.checked::after {
+    content: '✓';
+    color: white;
+    font-weight: 700;
+    font-size: 1.4rem;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -55%);
+    animation: pop 0.3s ease;
+    font-family: var(--font-display);
+  }
+  @keyframes pop {
+    0% { transform: translate(-50%, -55%) scale(0); }
+    60% { transform: translate(-50%, -55%) scale(1.3); }
+    100% { transform: translate(-50%, -55%) scale(1); }
+  }
+
+  /* Prize checkbox (screen time) — different style: ROUND + sparkle */
+  .prize-box {
+    display: inline-block;
+    width: 44px;
+    height: 44px;
+    border: 3px solid;
+    border-radius: 50%;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    vertical-align: middle;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .leo .prize-box  { border-color: var(--leo-accent);  color: var(--leo-primary-dark); }
+  .maya .prize-box { border-color: var(--maya-accent); color: var(--maya-primary-dark); }
+
+  .prize-box .prize-icon {
+    font-size: 1.1rem;
+    line-height: 1;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0.35;
+    transition: opacity 0.25s ease;
+  }
+
+  .prize-box.unlocked {
+    background: var(--leo-accent);
+    box-shadow: 0 0 12px rgba(245, 201, 107, 0.6);
+    animation: unlock-pulse 0.6s ease;
+  }
+  .maya .prize-box.unlocked {
+    background: var(--maya-accent);
+    box-shadow: 0 0 12px rgba(244, 217, 78, 0.7);
+  }
+  .prize-box.unlocked .prize-icon { opacity: 1; }
+
+  .prize-box.earned {
+    background: var(--leo-accent);
+  }
+  .maya .prize-box.earned {
+    background: var(--maya-accent);
+  }
+  .prize-box.earned::after {
+    content: '✓';
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 22px;
+    height: 22px;
+    background: var(--leo-primary-dark);
+    color: white;
+    border-radius: 50%;
+    font-size: 0.85rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+    font-family: var(--font-display);
+  }
+  .maya .prize-box.earned::after {
+    background: var(--maya-primary-dark);
+  }
+
+  @keyframes unlock-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+  }
+
+  /* -------- FOOTER MESSAGE -------- */
+  .chart-footer {
+    margin-top: 1.25rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 16px;
+    text-align: center;
+    font-family: var(--font-hand);
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+    line-height: 1.4;
+    border: 2px dashed rgba(0,0,0,0.08);
+  }
+  .chart-footer .big-word {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.05rem;
+  }
+  .leo .chart-footer .big-word  { color: var(--leo-primary-dark); }
+  .maya .chart-footer .big-word { color: var(--maya-primary-dark); }
+
+  /* -------- LEGEND (what each icon means) -------- */
+  .legend {
+    background: white;
+    border-radius: 16px;
+    padding: 0.9rem 1rem;
+    margin-bottom: 1rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    text-align: center;
+  }
+  .legend-item .leg-icon {
+    font-size: 1.8rem;
+    display: block;
+    line-height: 1;
+  }
+  .legend-item .leg-label {
+    font-family: var(--font-hand);
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    margin-top: 0.2rem;
+    display: block;
+    line-height: 1.2;
+  }
+  .legend-item .leg-label strong {
+    font-family: var(--font-display);
+    font-weight: 700;
+    display: block;
+    color: var(--ink);
+    font-size: 0.9rem;
+  }
+  .leo  .legend-item:nth-child(1) .leg-label strong { color: var(--leo-primary-dark); }
+  .leo  .legend-item:nth-child(2) .leg-label strong { color: var(--leo-secondary); }
+  .leo  .legend-item:nth-child(3) .leg-label strong { color: var(--leo-primary); }
+  .maya .legend-item:nth-child(1) .leg-label strong { color: var(--maya-primary-dark); }
+  .maya .legend-item:nth-child(2) .leg-label strong { color: var(--maya-secondary); }
+  .maya .legend-item:nth-child(3) .leg-label strong { color: var(--maya-primary); }
+
+  /* -------- PARENT NOTE -------- */
+  .parent-note {
+    max-width: 700px;
+    margin: 2rem auto 0;
+    padding: 1rem 1.25rem;
+    background: white;
+    border-radius: 14px;
+    border-left: 5px solid var(--ink-soft);
+    font-family: var(--font-hand);
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+    line-height: 1.5;
+  }
+  .parent-note strong {
+    font-family: var(--font-display);
+    color: var(--ink);
+    display: block;
+    margin-bottom: 0.3rem;
+    letter-spacing: 0.02em;
+  }
+
+  /* -------- RESET BUTTON -------- */
+  .reset-row {
+    text-align: center;
+    margin-top: 1.5rem;
+  }
+  .reset-btn {
+    background: transparent;
+    border: 2px solid var(--muted);
+    color: var(--muted);
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-family: var(--font-hand);
+    font-size: 0.85rem;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+  }
+  .reset-btn:hover { opacity: 1; color: var(--ink-soft); border-color: var(--ink-soft); }
+
+  /* -------- PRINT -------- */
+  @media print {
+    body { background: white; }
+    .picker, .reset-row { display: none; }
+    .chart.hidden { display: block !important; }
+    .charts.both { grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .charts:not(.both) { grid-template-columns: 1fr; }
+    .chart { page-break-inside: avoid; box-shadow: none; border: 2px solid; }
+    .chart.leo  { border-color: var(--leo-primary); }
+    .chart.maya { border-color: var(--maya-primary); }
+  }
+
+  @media (max-width: 520px) {
+    .chart-header { grid-template-columns: 1fr; text-align: center; }
+    .mascot { margin: 0 auto; width: 100px; height: 100px; }
+    .check-box, .prize-box { width: 36px; height: 36px; }
+    .legend { grid-template-columns: 1fr; gap: 0.3rem; text-align: left; padding: 0.6rem 0.9rem; }
+    .legend-item { display: grid; grid-template-columns: auto 1fr; gap: 0.6rem; align-items: center; }
+    .legend-item .leg-icon { font-size: 1.4rem; }
+    .stars-row { max-width: 280px; }
+    table.days tbody td { height: 44px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="header">
+    <h1><span class="maya-name">Maya</span> <span class="amp">&amp;</span> <span class="leo-name">Leo</span></h1>
+    <div class="sub">ons 21-dagen avontuur — elke dag worden we een beetje sterker</div>
+    <div class="dates">Zondag 19 april → Zaterdag 9 mei</div>
+  </header>
+
+  <nav class="picker" id="picker">
+    <button data-view="both" class="active-both">Allebei</button>
+    <button data-view="maya">Alleen Maya</button>
+    <button data-view="leo">Alleen Leo</button>
+  </nav>
+
+  <div class="charts both" id="charts">
+
+    <!-- ============ MAYA'S CHART ============ -->
+    <article class="chart maya" id="chart-maya">
+
+      <div class="chart-header">
+        <!-- MAYA'S MASCOT: Cute kawaii kitten with tennis ball -->
+        <svg class="mascot" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-label="Maya's kitten">
+          <ellipse cx="60" cy="110" rx="36" ry="4" fill="#5ba36b" opacity="0.15"/>
+          <!-- Tiny body -->
+          <ellipse cx="60" cy="96" rx="18" ry="12" fill="#d4907a"/>
+          <!-- Paws -->
+          <ellipse cx="52" cy="106" rx="5" ry="4" fill="#e8a890"/>
+          <ellipse cx="68" cy="106" rx="5" ry="4" fill="#e8a890"/>
+          <!-- Tail curling behind -->
+          <path d="M 76 92 Q 92 86 94 72 Q 96 62 88 58" fill="none" stroke="#d4907a" stroke-width="8" stroke-linecap="round"/>
+          <!-- BIG ROUND HEAD -->
+          <circle cx="60" cy="58" r="36" fill="#e8a890"/>
+          <!-- Soft highlight -->
+          <ellipse cx="52" cy="48" rx="18" ry="14" fill="#f2bba5" opacity="0.6"/>
+          <!-- Ears -->
+          <path d="M 32 36 Q 28 22 42 32 Q 42 38 38 40 Z" fill="#d4907a"/>
+          <path d="M 88 36 Q 92 22 78 32 Q 78 38 82 40 Z" fill="#d4907a"/>
+          <path d="M 34 34 Q 33 28 38 33 Z" fill="#e8a5c4"/>
+          <path d="M 86 34 Q 87 28 82 33 Z" fill="#e8a5c4"/>
+          <!-- HUGE sparkly eyes -->
+          <ellipse cx="46" cy="60" rx="7" ry="9" fill="#2a2520"/>
+          <ellipse cx="74" cy="60" rx="7" ry="9" fill="#2a2520"/>
+          <ellipse cx="48" cy="56" rx="3" ry="4" fill="white"/>
+          <ellipse cx="76" cy="56" rx="3" ry="4" fill="white"/>
+          <circle cx="44" cy="63" r="1.5" fill="white"/>
+          <circle cx="72" cy="63" r="1.5" fill="white"/>
+          <!-- Blush cheeks -->
+          <ellipse cx="36" cy="72" rx="6" ry="4" fill="#f4a6b0" opacity="0.5"/>
+          <ellipse cx="84" cy="72" rx="6" ry="4" fill="#f4a6b0" opacity="0.5"/>
+          <!-- Nose -->
+          <path d="M 57 74 L 63 74 L 60 78 Z" fill="#e8a5c4"/>
+          <!-- Sweet smile -->
+          <path d="M 60 78 Q 56 82 53 80" stroke="#2a2520" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+          <path d="M 60 78 Q 64 82 67 80" stroke="#2a2520" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+          <!-- Tennis ball in paws -->
+          <circle cx="60" cy="102" r="7" fill="#f4d94e"/>
+          <path d="M 53 102 Q 60 98 67 102" stroke="white" stroke-width="1" fill="none"/>
+          <path d="M 53 102 Q 60 106 67 102" stroke="white" stroke-width="1" fill="none"/>
+          <!-- Joy sparkles -->
+          <text x="12" y="28" font-size="12" fill="#e8a5c4">♡</text>
+          <text x="100" y="24" font-size="10" fill="#f4d94e">✦</text>
+          <text x="8" y="56" font-size="8" fill="#5ba36b">✦</text>
+        </svg>
+        <div>
+          <h2 class="chart-title">Hoi, ik ben Maya!</h2>
+          <p class="chart-motto">Elke dag dat ik oefen, <em>word ik sterker</em> 🎾</p>
+        </div>
+      </div>
+
+      <div class="progress-row">
+        <div class="progress-label">
+          Mijn volle dagen: <span class="big-num" id="maya-count">0</span> van 21
+        </div>
+        <div class="stars-row" id="maya-stars"><!-- 21 stars via JS --></div>
+        <div class="encourage empty" id="maya-encourage">Klaar om te beginnen? 🎾</div>
+      </div>
+
+      <div class="legend">
+        <div class="legend-item">
+          <span class="leg-icon">🎹</span>
+          <span class="leg-label"><strong>Piano</strong>15 minuten</span>
+        </div>
+        <div class="legend-item">
+          <span class="leg-icon">📚</span>
+          <span class="leg-label"><strong>Leren</strong>20 minuten</span>
+        </div>
+        <div class="legend-item">
+          <span class="leg-icon">🍎</span>
+          <span class="leg-label"><strong>Gezond eten</strong>lekker &amp; gezond</span>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="days">
+          <colgroup>
+            <col class="c-day">
+            <col class="c-habit">
+            <col class="c-habit">
+            <col class="c-habit">
+            <col class="c-prize">
+          </colgroup>
+          <thead>
+            <tr>
+              <th>Dag</th>
+              <th><span class="ht-icon">🎹</span>Piano<span class="ht-time">15 min</span></th>
+              <th><span class="ht-icon">📚</span>Leren<span class="ht-time">20 min</span></th>
+              <th><span class="ht-icon">🍎</span>Eten<span class="ht-time">gezond</span></th>
+              <th><span class="ht-icon">🎾</span>Scherm<span class="ht-time">30 min</span></th>
+            </tr>
+          </thead>
+          <tbody id="maya-tbody"><!-- rows via JS --></tbody>
+        </table>
+      </div>
+
+      <div class="chart-footer">
+        Als ik mijn piano, mijn leren én mijn gezond eten allemaal heb <span class="big-word">GEDAAN</span>, dan heb ik mijn 30 minuten iPad of Switch verdiend! 🎉<br>
+        Jij bent zó sterk, Maya — elke dag een beetje sterker. 🎾💚
+      </div>
+    </article>
+
+    <!-- ============ LEO'S CHART ============ -->
+    <article class="chart leo" id="chart-leo">
+
+      <div class="chart-header">
+        <!-- LEO'S MASCOT: Cute kawaii tabby kitten with basketball -->
+        <svg class="mascot" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-label="Leo's kitten">
+          <ellipse cx="60" cy="110" rx="36" ry="4" fill="#e8702a" opacity="0.15"/>
+          <!-- Tiny body -->
+          <ellipse cx="60" cy="96" rx="18" ry="12" fill="#a89080"/>
+          <!-- Belly patch -->
+          <ellipse cx="60" cy="98" rx="10" ry="6" fill="#e8dcc8"/>
+          <!-- Paws -->
+          <ellipse cx="52" cy="106" rx="5" ry="4" fill="#b89d8a"/>
+          <ellipse cx="68" cy="106" rx="5" ry="4" fill="#b89d8a"/>
+          <!-- Tail with stripe -->
+          <path d="M 76 92 Q 92 86 94 72 Q 96 62 88 58" fill="none" stroke="#a89080" stroke-width="8" stroke-linecap="round"/>
+          <ellipse cx="92" cy="70" rx="2.5" ry="3" fill="#7a6b5d" opacity="0.6"/>
+          <!-- BIG ROUND HEAD -->
+          <circle cx="60" cy="58" r="36" fill="#b89d8a"/>
+          <!-- Soft tabby stripes on forehead -->
+          <path d="M 48 32 Q 52 28 56 32" stroke="#7a6b5d" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.7"/>
+          <path d="M 64 32 Q 68 28 72 32" stroke="#7a6b5d" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.7"/>
+          <path d="M 56 40 Q 60 36 64 40" stroke="#7a6b5d" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.7"/>
+          <!-- Light muzzle area -->
+          <ellipse cx="60" cy="72" rx="14" ry="10" fill="#d4c4b0" opacity="0.7"/>
+          <!-- Ears -->
+          <path d="M 32 36 Q 28 22 42 32 Q 42 38 38 40 Z" fill="#a89080"/>
+          <path d="M 88 36 Q 92 22 78 32 Q 78 38 82 40 Z" fill="#a89080"/>
+          <path d="M 34 34 Q 33 28 38 33 Z" fill="#e8a890"/>
+          <path d="M 86 34 Q 87 28 82 33 Z" fill="#e8a890"/>
+          <!-- HUGE sparkly eyes -->
+          <ellipse cx="46" cy="60" rx="7" ry="9" fill="#2a2520"/>
+          <ellipse cx="74" cy="60" rx="7" ry="9" fill="#2a2520"/>
+          <ellipse cx="48" cy="56" rx="3" ry="4" fill="white"/>
+          <ellipse cx="76" cy="56" rx="3" ry="4" fill="white"/>
+          <circle cx="44" cy="63" r="1.5" fill="white"/>
+          <circle cx="72" cy="63" r="1.5" fill="white"/>
+          <!-- Blush -->
+          <ellipse cx="36" cy="72" rx="6" ry="4" fill="#e8a890" opacity="0.5"/>
+          <ellipse cx="84" cy="72" rx="6" ry="4" fill="#e8a890" opacity="0.5"/>
+          <!-- Nose -->
+          <path d="M 57 74 L 63 74 L 60 78 Z" fill="#e8702a"/>
+          <!-- Smile -->
+          <path d="M 60 78 Q 56 82 53 80" stroke="#2a2520" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+          <path d="M 60 78 Q 64 82 67 80" stroke="#2a2520" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+          <!-- Basketball -->
+          <circle cx="60" cy="102" r="7" fill="#e8702a"/>
+          <path d="M 53 102 Q 60 98 67 102" stroke="#6a2e0a" stroke-width="1" fill="none"/>
+          <path d="M 53 102 Q 60 106 67 102" stroke="#6a2e0a" stroke-width="1" fill="none"/>
+          <line x1="60" y1="95" x2="60" y2="109" stroke="#6a2e0a" stroke-width="1"/>
+          <!-- Sparkles -->
+          <text x="12" y="28" font-size="10" fill="#f5c96b">✦</text>
+          <text x="100" y="24" font-size="12" fill="#e8702a">★</text>
+          <text x="8" y="56" font-size="8" fill="#6ba3c9">✦</text>
+        </svg>
+        <div>
+          <h2 class="chart-title">Hoi, ik ben Leo!</h2>
+          <p class="chart-motto">Elke dag dat ik oefen, <em>word ik sterker</em> 🏀</p>
+        </div>
+      </div>
+
+      <div class="progress-row">
+        <div class="progress-label">
+          Mijn volle dagen: <span class="big-num" id="leo-count">0</span> van 21
+        </div>
+        <div class="stars-row" id="leo-stars"><!-- 21 stars via JS --></div>
+        <div class="encourage empty" id="leo-encourage">Klaar om te beginnen? 🏀</div>
+      </div>
+
+      <div class="legend">
+        <div class="legend-item">
+          <span class="leg-icon">🎹</span>
+          <span class="leg-label"><strong>Piano</strong>15 minuten</span>
+        </div>
+        <div class="legend-item">
+          <span class="leg-icon">📚</span>
+          <span class="leg-label"><strong>Leren</strong>20 minuten</span>
+        </div>
+        <div class="legend-item">
+          <span class="leg-icon">🍎</span>
+          <span class="leg-label"><strong>Gezond eten</strong>lekker &amp; gezond</span>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="days">
+          <colgroup>
+            <col class="c-day">
+            <col class="c-habit">
+            <col class="c-habit">
+            <col class="c-habit">
+            <col class="c-prize">
+          </colgroup>
+          <thead>
+            <tr>
+              <th>Dag</th>
+              <th><span class="ht-icon">🎹</span>Piano<span class="ht-time">15 min</span></th>
+              <th><span class="ht-icon">📚</span>Leren<span class="ht-time">20 min</span></th>
+              <th><span class="ht-icon">🍎</span>Eten<span class="ht-time">gezond</span></th>
+              <th><span class="ht-icon">🏀</span>Scherm<span class="ht-time">30 min</span></th>
+            </tr>
+          </thead>
+          <tbody id="leo-tbody"><!-- rows via JS --></tbody>
+        </table>
+      </div>
+
+      <div class="chart-footer">
+        Als ik mijn piano, mijn leren én mijn gezond eten allemaal heb <span class="big-word">GEDAAN</span>, dan heb ik mijn 30 minuten iPad of Switch verdiend! 🎉<br>
+        Jij bent zó stoer, Leo — elke dag een beetje sterker. 🏀💪
+      </div>
+    </article>
+
+  </div>
+
+  <div class="parent-note">
+    <strong>For Mama</strong>
+    The kids see this in Dutch. Each habit saves automatically on this device. When all 3 daily habits are checked, the screen-time circle turns gold and pulses — tap it to mark screen time used. Every few days a pop-up encouragement celebrates milestones (1, 3, 5, 7, 10, 14, 17, 21 days). Print the page any time for the wall (buttons hide on print, "Allebei" lays out side-by-side on A4 landscape). Start: Sunday 19 April 2026. End: Saturday 9 May 2026.
+  </div>
+
+  <div class="reset-row">
+    <button class="reset-btn" id="reset-btn">Reset Maya &amp; Leo data</button>
+  </div>
+
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  const START = new Date(2026, 3, 19); // April 19, 2026
+  const DAYS = 21;
+  const STORAGE_KEY = 'maya_leo_adventure_v1';
+  const KIDS = ['maya', 'leo'];
+  const HABITS = ['piano', 'study', 'healthy'];
+
+  const DOW_FULL = ['Zo','Ma','Di','Wo','Do','Vr','Za'];
+  const MON_SHORT = ['jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
+
+  // Dutch encouragement messages that pop up when full days are reached
+  const ENCOURAGEMENTS = {
+    1:  '🌟 Eerste volle dag! Je bent begonnen!',
+    3:  '💪 Drie dagen sterk! Goed bezig!',
+    5:  '✨ Vijf dagen! Je bent een kampioen!',
+    7:  '🎉 Een hele week volgehouden! Wow!',
+    10: '🏆 Tien volle dagen! Je bent ongelofelijk!',
+    14: '🌈 Twee weken! Je bent onstopbaar!',
+    17: '⭐ Zeventien dagen! Zo trots op jou!',
+    21: '👑 JA! 21 volle dagen! Jij bent een held!'
+  };
+
+  let state = { maya: {}, leo: {} };
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        state = { maya: {}, leo: {}, ...parsed };
+      }
+    } catch (e) { console.warn('Could not load', e); }
+  }
+  function saveState() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+    catch (e) { console.warn('Could not save', e); }
+  }
+
+  function fmtDate(d) {
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+  function addDays(d, n) {
+    const x = new Date(d);
+    x.setDate(x.getDate() + n);
+    return x;
+  }
+  function getToday() {
+    const now = new Date();
+    now.setHours(0,0,0,0);
+    return now;
+  }
+
+  // =============== BUILD A CHART ===============
+  function buildChart(kid) {
+    const tbody = document.getElementById(`${kid}-tbody`);
+    tbody.innerHTML = '';
+    const todayKey = fmtDate(getToday());
+
+    for (let i = 0; i < DAYS; i++) {
+      const d = addDays(START, i);
+      const key = fmtDate(d);
+      const tr = document.createElement('tr');
+      if (key === todayKey) tr.classList.add('today');
+
+      // Day label
+      const dayTd = document.createElement('td');
+      dayTd.className = 'day-label';
+      dayTd.innerHTML =
+        `<span class="d-num">Dag ${i+1}</span>` +
+        `<span class="d-date">${DOW_FULL[d.getDay()]} ${d.getDate()} ${MON_SHORT[d.getMonth()]}</span>`;
+      tr.appendChild(dayTd);
+
+      // Habit check boxes
+      HABITS.forEach(h => {
+        const td = document.createElement('td');
+        const box = document.createElement('span');
+        box.className = 'check-box';
+        box.setAttribute('role', 'checkbox');
+        box.setAttribute('tabindex', '0');
+        box.setAttribute('aria-label', `${kid} — ${h} — day ${i+1}`);
+        box.dataset.kid = kid;
+        box.dataset.date = key;
+        box.dataset.habit = h;
+        td.appendChild(box);
+        tr.appendChild(td);
+      });
+
+      // Prize (screen time) — round box with icon
+      const prizeTd = document.createElement('td');
+      const prize = document.createElement('span');
+      prize.className = 'prize-box';
+      prize.setAttribute('role', 'checkbox');
+      prize.setAttribute('tabindex', '0');
+      prize.setAttribute('aria-label', `${kid} — screen time earned — day ${i+1}`);
+      prize.dataset.kid = kid;
+      prize.dataset.date = key;
+      prize.dataset.habit = 'prize';
+      const icon = document.createElement('span');
+      icon.className = 'prize-icon';
+      icon.textContent = kid === 'leo' ? '🏀' : '🎾';
+      prize.appendChild(icon);
+      prizeTd.appendChild(prize);
+      tr.appendChild(prizeTd);
+
+      tbody.appendChild(tr);
+    }
+
+    // Build 21 stars for progress display
+    const starsRow = document.getElementById(`${kid}-stars`);
+    starsRow.innerHTML = '';
+    for (let i = 0; i < DAYS; i++) {
+      const s = document.createElement('div');
+      s.className = 'star';
+      s.dataset.dayIdx = i;
+      s.dataset.kid = kid;
+      s.textContent = i + 1;
+      starsRow.appendChild(s);
+    }
+
+    applyState(kid);
+  }
+
+  function applyState(kid) {
+    const data = state[kid] || {};
+
+    // Apply habit checks and prize states
+    document.querySelectorAll(`.check-box[data-kid="${kid}"], .prize-box[data-kid="${kid}"]`).forEach(el => {
+      const { date, habit } = el.dataset;
+      const d = data[date] || {};
+      if (habit === 'prize') {
+        // Decide visual state:
+        // - "earned" = kid has USED their screen time today (manually tapped)
+        // - "unlocked" = all 3 habits done but screen time not yet tapped
+        // - default = not all habits done yet
+        const allDone = HABITS.every(h => d[h]);
+        el.classList.remove('unlocked', 'earned');
+        if (d.prize) el.classList.add('earned');
+        else if (allDone) el.classList.add('unlocked');
+      } else {
+        el.classList.toggle('checked', !!d[habit]);
+        el.setAttribute('aria-checked', d[habit] ? 'true' : 'false');
+      }
+    });
+
+    // Recount stars
+    let fullDays = 0;
+    let prevFullDays = parseInt(document.getElementById(`${kid}-count`).textContent || '0', 10);
+    for (let i = 0; i < DAYS; i++) {
+      const key = fmtDate(addDays(START, i));
+      const d = data[key] || {};
+      const done = HABITS.filter(h => d[h]).length;
+      const starEl = document.querySelector(`.star[data-kid="${kid}"][data-day-idx="${i}"]`);
+      if (!starEl) continue;
+      starEl.classList.remove('complete', 'partial');
+      if (done === 3) { starEl.classList.add('complete'); fullDays++; }
+      else if (done > 0) { starEl.classList.add('partial'); }
+    }
+    document.getElementById(`${kid}-count`).textContent = fullDays;
+
+    // Update encouragement message
+    const encEl = document.getElementById(`${kid}-encourage`);
+    if (encEl) {
+      encEl.classList.remove('celebrate');
+      if (fullDays === 0) {
+        encEl.classList.add('empty');
+        encEl.textContent = kid === 'maya' ? 'Klaar om te beginnen? 🎾' : 'Klaar om te beginnen? 🏀';
+      } else {
+        encEl.classList.remove('empty');
+        // Find the most recent milestone reached
+        const milestones = Object.keys(ENCOURAGEMENTS).map(Number).sort((a, b) => a - b);
+        let msg = `${fullDays} ${fullDays === 1 ? 'dag' : 'dagen'} gelukt — ga zo door! ✨`;
+        for (const m of milestones) {
+          if (fullDays >= m) msg = ENCOURAGEMENTS[m];
+        }
+        encEl.textContent = msg;
+        // Celebrate if we just crossed a milestone
+        if (fullDays > prevFullDays && milestones.includes(fullDays)) {
+          encEl.classList.add('celebrate');
+        }
+      }
+    }
+  }
+
+  // =============== CLICK HANDLING ===============
+  function handleToggle(el) {
+    const { kid, date, habit } = el.dataset;
+    if (!state[kid][date]) state[kid][date] = {};
+
+    if (habit === 'prize') {
+      // Only allow marking prize if all 3 habits done
+      const d = state[kid][date];
+      const allDone = HABITS.every(h => d[h]);
+      if (!allDone && !d.prize) {
+        // Gently shake the prize — not yet unlocked
+        el.animate([
+          { transform: 'translateX(0)' },
+          { transform: 'translateX(-4px)' },
+          { transform: 'translateX(4px)' },
+          { transform: 'translateX(-2px)' },
+          { transform: 'translateX(0)' }
+        ], { duration: 300 });
+        return;
+      }
+      state[kid][date].prize = !state[kid][date].prize;
+    } else {
+      state[kid][date][habit] = !state[kid][date][habit];
+      // If any habit is unchecked, cancel the prize too
+      if (!state[kid][date][habit]) {
+        const allDoneNow = HABITS.every(h => state[kid][date][h]);
+        if (!allDoneNow) state[kid][date].prize = false;
+      }
+    }
+
+    saveState();
+    applyState(kid);
+  }
+
+  document.addEventListener('click', (e) => {
+    const el = e.target.closest('.check-box, .prize-box');
+    if (!el) return;
+    handleToggle(el);
+  });
+  document.addEventListener('keydown', (e) => {
+    if ((e.key === ' ' || e.key === 'Enter')) {
+      const el = e.target;
+      if (el.classList && (el.classList.contains('check-box') || el.classList.contains('prize-box'))) {
+        e.preventDefault();
+        handleToggle(el);
+      }
+    }
+  });
+
+  // =============== VIEW PICKER ===============
+  function initPicker() {
+    const buttons = document.querySelectorAll('#picker button');
+    const charts = document.getElementById('charts');
+    const mayaChart = document.getElementById('chart-maya');
+    const leoChart = document.getElementById('chart-leo');
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const view = btn.dataset.view;
+        buttons.forEach(b => {
+          b.classList.remove('active-both', 'active-maya', 'active-leo');
+        });
+        btn.classList.add(`active-${view}`);
+
+        charts.classList.toggle('both', view === 'both');
+        mayaChart.classList.toggle('hidden', view === 'leo');
+        leoChart.classList.toggle('hidden', view === 'maya');
+      });
+    });
+  }
+
+  // =============== RESET ===============
+  function initReset() {
+    document.getElementById('reset-btn').addEventListener('click', () => {
+      if (!confirm("Weet je zeker dat je alle voortgang van Maya & Leo wilt wissen? (Mama-check!)")) return;
+      state = { maya: {}, leo: {} };
+      saveState();
+      KIDS.forEach(applyState);
+    });
+  }
+
+  // =============== INIT ===============
+  document.addEventListener('DOMContentLoaded', () => {
+    loadState();
+    KIDS.forEach(buildChart);
+    initPicker();
+    initReset();
+  });
+
+})();
+</script>
+</body>
+</html>
